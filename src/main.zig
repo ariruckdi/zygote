@@ -1,6 +1,7 @@
 const std = @import("std");
 pub const Chess = @import("chess.zig");
 pub const Bitboard = @import("bitboard.zig").Bitboard;
+pub const Movegen = @import("movegen.zig");
 
 pub fn main() !void {
     // Prints to stderr (it's a shortcut based on `std.io.getStdErr()`)

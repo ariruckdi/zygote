@@ -26,6 +26,10 @@ pub const Board = struct {
         return Board{};
     }
 
+    fn occupied(self: *Board) Bitboard {
+        return Bitboard.combine_add(self.white_pieces, self.black_pieces);
+    }
+
     fn set(self: *Board, square: u6, piece: u3, white: bool) void {
         if (white) {
             self.white_pieces.set(square);
@@ -47,10 +51,34 @@ pub const Board = struct {
             KING => {
                 if (white) self.white_king = square else self.black_king = square;
             },
+            KNIGHT => {},
             else => {
                 unreachable;
             },
         }
+    }
+
+    fn has_piece(self: *Board, square: u6) bool {
+        return self.occupied().get(square);
+    }
+
+    fn get_piece(self: *Board, square: u6) u3 {
+        if (self.pawns.get(square)) return PAWN;
+        if (self.black_king == square or self.white_king == square) return KING;
+        const dia_slider = self.dia_sliders.get(square);
+        const ortho_slider = self.ortho_sliders.get(square);
+        if (dia_slider and ortho_slider) return QUEEN;
+        if (dia_slider) return BISHOP;
+        if (ortho_slider) return ROOK;
+        if (self.occupied().get(square)) return KNIGHT;
+        return 0;
+    }
+
+    //be very careful about not calling this for an empty space,
+    //the occupied check will be removed for speed at some point
+    fn get_color(self: *Board, square: u6) bool {
+        if (!self.occupied().get(square)) unreachable;
+        return self.white_pieces.get(square);
     }
 
     pub fn init_fen(fen: *const []u8) Board {
