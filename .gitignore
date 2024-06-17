@@ -1,0 +1,8 @@
+*.cfg
+python.zip
+python
+installer.ifp
+pishock.cfg
+*.pyc
+script\__pycache__
+PiShockOSC Installer.exe
