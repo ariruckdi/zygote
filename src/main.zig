@@ -126,7 +126,7 @@ pub fn main() !void {
 }
 
 test "board basics" {
-    var board = Board.init();
+    const board = Board.init();
     try std.testing.expectEqual(board, Board.init());
 }
 
