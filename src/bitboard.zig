@@ -48,6 +48,23 @@ pub const Bitboard = struct {
     pub fn combine_overlap(lhs: *Bitboard, rhs: *Bitboard) Bitboard {
         return Bitboard.init(rhs.this & lhs.this);
     }
+
+    pub fn to_string(self: *const Bitboard) *[72]u8 {
+        var result = [_]u8{' '} ** 72;
+        var idx: usize = 0;
+        for (0..8) |row| {
+            for (0..8) |col| {
+                const square = (7 - row) * 8 + col;
+                result[idx] = if (self.get(@intCast(square))) '1' else '0';
+                std.debug.print("\nidx: {d}, result[idx]: {c}, square: {d}", .{ idx, result[idx], square });
+                idx += 1;
+            }
+            result[idx] = '-';
+            std.debug.print("\nidx: {d}, result[idx]: {c}", .{ idx, result[idx] });
+            idx += 1;
+        }
+        return &result;
+    }
 };
 
 test "bitboard basics" {
@@ -55,4 +72,5 @@ test "bitboard basics" {
     bb_test.set(4);
     try std.testing.expectEqual(bb_test, Bitboard.init(0b10000));
     try std.testing.expect(bb_test.get(4));
+    std.debug.print("\n{s}", .{bb_test.to_string()});
 }
