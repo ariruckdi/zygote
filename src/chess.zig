@@ -27,7 +27,7 @@ pub const Board = struct {
     }
 
     fn occupied(self: *Board) Bitboard {
-        return Bitboard.combine_add(self.white_pieces, self.black_pieces);
+        return Bitboard.combine_add(&self.white_pieces, &self.black_pieces);
     }
 
     fn set(self: *Board, square: u6, piece: u3, white: bool) void {
@@ -39,10 +39,14 @@ pub const Board = struct {
             self.white_pieces.rm(square);
         }
         switch (piece) {
-            BISHOP, QUEEN => {
+            BISHOP => {
                 self.dia_sliders.set(square);
             },
-            ROOK, QUEEN => {
+            ROOK => {
+                self.ortho_sliders.set(square);
+            },
+            QUEEN => {
+                self.dia_sliders.set(square);
                 self.ortho_sliders.set(square);
             },
             PAWN => {
@@ -101,22 +105,37 @@ pub const Board = struct {
         };
     }
 
-    pub fn init_fen(fen: *const []u8) Board {
+    pub fn init_fen(fen: []const u8) Board {
         var result = Board.init();
-        var row = 0;
-        var col = 0;
+        var row: u6 = 0;
+        var col: u6 = 0;
 
-        var fen_index = 0;
+        var fen_index: usize = 0;
 
         while (fen_index < fen.len and row < 8) : (fen_index += 1) {
-            var char = fen[fen_index];
+            const char = fen[fen_index];
             switch (char) {
-                '1'...'8' => {col += @as(usize, char - '0')}
+                '1'...'8' => {
+                    col += @intCast(char - '0');
+                },
+                '/' => {
+                    row += 1;
+                    col = 0;
+                },
+                'p', 'n', 'b', 'r', 'q', 'k', 'P', 'N', 'B', 'R', 'Q', 'K' => {
+                    const square = (7 - row) * 8 + col;
+                    result.set(square, piece_from_char(char), color_from_char(char));
+                    std.debug.print("\n{c} at {d}", .{ char, square });
+
+                    col += 1;
+                },
+                else => {
+                    std.debug.print("{c}", .{char});
+                    break;
+                },
             }
         }
-
-        _ = fen;
-        unreachable;
+        return result;
     }
 
     pub fn domove(self: *Board, move: Move) void {
@@ -135,4 +154,7 @@ pub const Board = struct {
 test "board basics" {
     const board = Board.init();
     try std.testing.expectEqual(board, Board.init());
+    var board2 = Board.init_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    try std.testing.expectEqual(board2.get_piece(0), ROOK);
+    try std.testing.expectEqual(board2.get_color(0), true);
 }

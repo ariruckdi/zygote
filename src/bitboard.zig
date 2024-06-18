@@ -17,7 +17,7 @@ pub const Bitboard = struct {
         self.this = self.this | (U64_1 << square);
     }
 
-    pub fn get(self: *Bitboard, square: u6) bool {
+    pub fn get(self: *const Bitboard, square: u6) bool {
         return (self.this & (U64_1 << square)) != 0;
     }
 
