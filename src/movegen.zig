@@ -1,7 +1,7 @@
 const Chess = @import("chess.zig");
 const Bitboard = @import("bitboard.zig").Bitboard;
 
-const KNIGHT_DIRECTIONS = []i7{ 15, 17, 10, 6 };
+const KNIGHT_DIRECTIONS = []u6{ 15, 17, 10, 6 };
 
 //TODO write test for this
 

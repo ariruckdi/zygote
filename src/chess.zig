@@ -81,7 +81,40 @@ pub const Board = struct {
         return self.white_pieces.get(square);
     }
 
+    fn piece_from_char(c: u8) u3 {
+        return switch (c) {
+            'p', 'P' => PAWN,
+            'n', 'N' => KNIGHT,
+            'b', 'B' => BISHOP,
+            'r', 'R' => ROOK,
+            'q', 'Q' => QUEEN,
+            'k', 'K' => KING,
+            else => 0,
+        };
+    }
+
+    fn color_from_char(c: u8) bool {
+        return switch (c) {
+            'p', 'n', 'b', 'r', 'q', 'k' => false,
+            'P', 'N', 'B', 'R', 'Q', 'K' => true,
+            else => unreachable,
+        };
+    }
+
     pub fn init_fen(fen: *const []u8) Board {
+        var result = Board.init();
+        var row = 0;
+        var col = 0;
+
+        var fen_index = 0;
+
+        while (fen_index < fen.len and row < 8) : (fen_index += 1) {
+            var char = fen[fen_index];
+            switch (char) {
+                '1'...'8' => {col += @as(usize, char - '0')}
+            }
+        }
+
         _ = fen;
         unreachable;
     }
