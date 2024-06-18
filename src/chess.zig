@@ -130,7 +130,7 @@ pub const Board = struct {
                     col += 1;
                 },
                 else => {
-                    std.debug.print("{c}", .{char});
+                    std.debug.print("{--c--}", .{char});
                     break;
                 },
             }
