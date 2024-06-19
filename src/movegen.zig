@@ -15,8 +15,8 @@ fn dy(square1: i8, square2: i8) i8 {
 }
 
 fn ok_knight_deltas(square: i8, target: i8) bool {
-    if (dx(square, target) == 1 and dy(square, target) == 2) return true;
-    if (dx(square, target) == 2 and dy(square, target) == 1) return true;
+    if (@abs(dx(square, target)) == 1 and @abs(dy(square, target)) == 2) return true;
+    if (@abs(dx(square, target)) == 2 and @abs(dy(square, target)) == 1) return true;
     return false;
 }
 
@@ -42,4 +42,6 @@ test "knight" {
     var compare: Bitboard = Bitboard.init_single(10);
     compare.set(17);
     try std.testing.expectEqual(compare, precomputed_knight_moves[0]);
+    std.debug.print("\n{s}", .{precomputed_knight_moves[0].to_string()});
+    std.debug.print("\n{s}", .{precomputed_knight_moves[27].to_string()});
 }
