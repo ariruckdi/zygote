@@ -19,7 +19,7 @@ pub const Board = struct {
     white_king: u6 = 0,
     black_king: u6 = 63,
     ep: u6 = 0,
-    castling: u4 = 0b1111,
+    castling: u4 = 0b0000,
     whites_turn: bool = true,
 
     pub fn init() Board {
@@ -129,12 +129,60 @@ pub const Board = struct {
 
                     col += 1;
                 },
+                ' ' => {},
                 else => {
-                    std.debug.print("\n--{c}--", .{char});
                     break;
                 },
             }
         }
+
+        while (fen_index < fen.len) : (fen_index += 1) {
+            const char = fen[fen_index];
+            switch (char) {
+                'w' => {
+                    std.debug.print("\nWhite to move.", .{});
+                    result.whites_turn = true;
+                },
+                'b' => {
+                    std.debug.print("\nBlack to move.", .{});
+                    result.whites_turn = false;
+                },
+                ' ' => {},
+                else => {
+                    break;
+                },
+            }
+        }
+
+        while (fen_index < fen.len) : (fen_index += 1) {
+            const char = fen[fen_index];
+            switch (char) {
+                '-' => {
+                    std.debug.print("\nNo castling.", .{});
+                },
+                'K' => {
+                    std.debug.print("\nWhite can castle kingside.", .{});
+                    result.castling |= 0b0001;
+                },
+                'Q' => {
+                    std.debug.print("\nWhite can castle queenside.", .{});
+                    result.castling |= 0b0010;
+                },
+                'k' => {
+                    std.debug.print("\nBlack can castle kingside.", .{});
+                    result.castling |= 0b0100;
+                },
+                'q' => {
+                    std.debug.print("\nBlack can castle queenside.", .{});
+                    result.castling |= 0b1000;
+                },
+                else => {
+                    break;
+                },
+            }
+        }
+        //TODO: get ep space and movecounters from fen
+        std.debug.print("\nCastling: 0b{b}", .{result.castling});
         return result;
     }
 
@@ -152,9 +200,9 @@ pub const Board = struct {
 };
 
 test "board basics" {
-    const board = Board.init();
-    try std.testing.expectEqual(board, Board.init());
-    var board2 = Board.init_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    try std.testing.expectEqual(board2.get_piece(0), ROOK);
-    try std.testing.expectEqual(board2.get_color(0), true);
+    var board = Board.init_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    try std.testing.expectEqual(ROOK, board.get_piece(0));
+    try std.testing.expectEqual(true, board.get_color(0));
+    try std.testing.expectEqual(0b1111, board.castling);
+    try std.testing.expectEqual(true, board.whites_turn);
 }
