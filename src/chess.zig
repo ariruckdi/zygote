@@ -66,6 +66,7 @@ pub const Board = struct {
         return self.occupied().get(square);
     }
 
+    //do not call on an empty square
     fn get_piece(self: *Board, square: u6) u3 {
         if (self.pawns.get(square)) return PAWN;
         if (self.black_king == square or self.white_king == square) return KING;
@@ -75,7 +76,7 @@ pub const Board = struct {
         if (dia_slider) return BISHOP;
         if (ortho_slider) return ROOK;
         if (self.occupied().get(square)) return KNIGHT;
-        return 0;
+        unreachable;
     }
 
     //be very careful about not calling this for an empty space,

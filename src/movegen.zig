@@ -59,5 +59,6 @@ test "knight" {
     var compare: Bitboard = Bitboard.init_single(10);
     compare.set(17);
     try std.testing.expectEqual(compare, precomputed_knight_moves[0]);
-    std.debug.print("{s}", .{precomputed_knight_moves[45].to_string()});
+    std.debug.print("\n{s}", .{precomputed_knight_moves[0].to_string()});
+    std.debug.print("\n{s}", .{precomputed_knight_moves[27].to_string()});
 }
