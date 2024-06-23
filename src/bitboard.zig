@@ -49,7 +49,7 @@ pub const Bitboard = struct {
         return Bitboard.init(rhs.this & lhs.this);
     }
 
-    pub fn to_string(self: *const Bitboard) *[72]u8 {
+    pub fn to_string(self: *const Bitboard) [72]u8 {
         var result = [_]u8{' '} ** 72;
         var idx: usize = 0;
         for (0..8) |row| {
@@ -63,7 +63,7 @@ pub const Bitboard = struct {
             std.debug.print("\nidx: {d}, result[idx]: {c}", .{ idx, result[idx] });
             idx += 1;
         }
-        return &result;
+        return result;
     }
 };
 
