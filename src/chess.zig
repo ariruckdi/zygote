@@ -26,8 +26,16 @@ pub const Board = struct {
         return Board{};
     }
 
-    fn occupied(self: *Board) Bitboard {
+    pub fn occupied(self: *Board) Bitboard {
         return Bitboard.combine_add(&self.white_pieces, &self.black_pieces);
+    }
+
+    pub fn x(square: u6) u6 {
+        return square % 8;
+    }
+
+    pub fn y(square: u6) u6 {
+        return square / 8;
     }
 
     fn set(self: *Board, square: u6, piece: u3, white: bool) void {
