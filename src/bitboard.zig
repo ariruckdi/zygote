@@ -75,6 +75,10 @@ pub const Bitboard = struct {
         const lookup_index: usize = (@mulWithOverflow(folded, 0x78291ACF)[0]) >> 26;
         return BITSCAN_TABLE[lookup_index];
     }
+
+    pub fn bitscan_bw(self: *const Bitboard) u6 { //returns index of most significant bit of bitboard
+        
+    }
 };
 
 test "bitboard basics" {
