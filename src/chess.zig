@@ -26,8 +26,16 @@ pub const Board = struct {
         return Board{};
     }
 
-    pub fn occupied(self: *Board) Bitboard {
-        return Bitboard.combine_add(&self.white_pieces, &self.black_pieces);
+    pub fn occupied(self: *const Board) Bitboard {
+        return Bitboard.combine_add(self.white_pieces, self.black_pieces);
+    }
+
+    pub fn them(self: *const Board, white: bool) Bitboard {
+        return if (white) self.black_pieces else self.white_pieces;
+    }
+
+    pub fn us(self: *const Board, white: bool) Bitboard {
+        return if (white) self.white_pieces else self.black_pieces;
     }
 
     pub fn x(square: u6) u6 {
@@ -75,7 +83,7 @@ pub const Board = struct {
     }
 
     //do not call on an empty square
-    fn get_piece(self: *Board, square: u6) u3 {
+    pub fn get_piece(self: *const Board, square: u6) u3 {
         if (self.pawns.get(square)) return PAWN;
         if (self.black_king == square or self.white_king == square) return KING;
         const dia_slider = self.dia_sliders.get(square);
@@ -89,7 +97,7 @@ pub const Board = struct {
 
     //be very careful about not calling this for an empty space,
     //the occupied check will be removed for speed at some point
-    fn get_color(self: *Board, square: u6) bool {
+    pub fn get_color(self: *const Board, square: u6) bool {
         if (!self.occupied().get(square)) unreachable;
         return self.white_pieces.get(square);
     }

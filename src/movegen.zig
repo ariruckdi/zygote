@@ -194,16 +194,24 @@ fn dump_precomp_data(data: *const [64]Bitboard) void {
 }
 
 //pseudo legal movegen
-fn knight_moves(square: u6, board: *Chess.Board, white: bool, quiets: bool) Bitboard {
-    const opponent = if (white) {
-        &board.black_pieces;
-    } else {
-        &board.white_pieces;
-    };
-    const quiet = Bitboard.combine_sub(precomp_knight[square], board.occupied());
-    const captures = Bitboard.combine_overlap(precomp_knight[square], opponent);
+fn knight_moves(square: u6, board: *const Chess.Board, white: bool, quiets: bool) Bitboard {
+    const captures = Bitboard.combine_overlap(precomp_knight[square], board.them(white));
     if (!quiets) return captures;
+
+    const quiet = Bitboard.combine_sub(precomp_knight[square], board.occupied());
     return Bitboard.combine_add(quiet, captures);
+}
+
+fn pawn_captures(square: u6, board: *const Chess.Board, white: bool) Bitboard {
+    const precomp_to_use = if (white) precomp_pawn_attack_white[square] else precomp_pawn_attack_black[square];
+    return Bitboard.combine_overlap(precomp_to_use, board.them(white));
+}
+
+//TODO this ignores pawns being blocked
+fn pawn_moves(square: u6, board: *const Chess.Board, white: bool) Bitboard {
+    const precomp_to_use = if (white) precomp_pawn_push_white[square] else precomp_pawn_push_black[square];
+    const result = Bitboard.combine_sub(precomp_to_use, board.occupied());
+    return result;
 }
 
 //legal movegen
@@ -235,7 +243,14 @@ test "black pawn" {
     try std.testing.expectEqual(compare, precomp_pawn_push_black[48]);
 
     var compare_caps = Bitboard.init(0);
-    var pawn_captures = [_]u6{ 0, 2 };
-    compare_caps.set_group(&pawn_captures);
+    var pawn_caps = [_]u6{ 0, 2 };
+    compare_caps.set_group(&pawn_caps);
     try std.testing.expectEqual(compare_caps, precomp_pawn_attack_black[9]);
+}
+
+test "knight in start pos" {
+    var board = Chess.Board.init_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+    try std.testing.expectEqual(Chess.KNIGHT, board.get_piece(1));
+    try std.testing.expectEqual(true, board.get_color(1));
+    std.debug.print("\n{s}", .{knight_moves(1, &board, true, true).to_string()});
 }

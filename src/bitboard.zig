@@ -37,23 +37,23 @@ pub const Bitboard = struct {
         self.this = ~self.this;
     }
 
-    pub fn add(self: *Bitboard, other: *Bitboard) void {
+    pub fn add(self: *Bitboard, other: Bitboard) void {
         self.this = self.this | other.this;
     }
 
-    pub fn sub(self: *Bitboard, other: *Bitboard) void {
+    pub fn sub(self: *Bitboard, other: Bitboard) void {
         self.this = self.this & ~other.this;
     }
 
-    pub fn combine_add(lhs: *Bitboard, rhs: *Bitboard) Bitboard {
+    pub fn combine_add(lhs: Bitboard, rhs: Bitboard) Bitboard {
         return Bitboard.init(rhs.this | lhs.this);
     }
 
-    pub fn combine_sub(lhs: *Bitboard, rhs: *Bitboard) Bitboard {
-        return Bitboard.init(rhs.this & ~lhs.this);
+    pub fn combine_sub(lhs: Bitboard, rhs: Bitboard) Bitboard {
+        return Bitboard.init(lhs.this & ~rhs.this);
     }
 
-    pub fn combine_overlap(lhs: *Bitboard, rhs: *Bitboard) Bitboard {
+    pub fn combine_overlap(lhs: Bitboard, rhs: Bitboard) Bitboard {
         return Bitboard.init(rhs.this & lhs.this);
     }
 
