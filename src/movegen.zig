@@ -207,11 +207,23 @@ fn pawn_captures(square: u6, board: *const Chess.Board, white: bool) Bitboard {
     return Bitboard.combine_overlap(precomp_to_use, board.them(white));
 }
 
-//TODO this ignores pawns being blocked
-fn pawn_moves(square: u6, board: *const Chess.Board, white: bool) Bitboard {
+fn pawn_pushes(square: u6, board: *const Chess.Board, white: bool) Bitboard {
     const precomp_to_use = if (white) precomp_pawn_push_white[square] else precomp_pawn_push_black[square];
     const result = Bitboard.combine_sub(precomp_to_use, board.occupied());
+    if (result.bitscan_fw() == result.bitscan_bw()) { //result is single, might be invalid
+        if (@abs(dy(result.bitscan_fw(), @intCast(square))) == 2) { //we jumped one, discard result
+            return Bitboard.init(0);
+        }
+    }
     return result;
+}
+
+fn pawn_moves(square: u6, board: *const Chess.Board, white: bool) Bitboard {
+    var captures = pawn_captures(square, board, white);
+    const pushes = pawn_pushes(square, board, white);
+    const ep = Bitboard.init_single(board.ep);
+    if (ep != 0) captures.add(ep);
+    return Bitboard.combine_add(captures, pushes);
 }
 
 //legal movegen
@@ -238,8 +250,8 @@ test "king" {
 
 test "black pawn" {
     var compare = Bitboard.init(0);
-    var pawn_pushes = [_]u6{ 40, 32 };
-    compare.set_group(&pawn_pushes);
+    var pawn_push = [_]u6{ 40, 32 };
+    compare.set_group(&pawn_push);
     try std.testing.expectEqual(compare, precomp_pawn_push_black[48]);
 
     var compare_caps = Bitboard.init(0);
