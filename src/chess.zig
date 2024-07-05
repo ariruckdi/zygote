@@ -78,8 +78,12 @@ pub const Board = struct {
         }
     }
 
-    fn has_piece(self: *Board, square: u6) bool {
+    pub fn has_piece(self: *const Board, square: u6) bool {
         return self.occupied().get(square);
+    }
+
+    pub fn no_piece(self: *const Board, square: u6) bool {
+        return self.occupied().get(square) == false;
     }
 
     //do not call on an empty square
@@ -97,7 +101,7 @@ pub const Board = struct {
 
     //be very careful about not calling this for an empty space,
     //the occupied check will be removed for speed at some point
-    pub fn get_color(self: *const Board, square: u6) bool {
+    pub fn white_piece_on_sqare(self: *const Board, square: u6) bool {
         if (!self.occupied().get(square)) unreachable;
         return self.white_pieces.get(square);
     }
@@ -114,7 +118,7 @@ pub const Board = struct {
         };
     }
 
-    fn color_from_char(c: u8) bool {
+    fn is_white_from_char(c: u8) bool {
         return switch (c) {
             'p', 'n', 'b', 'r', 'q', 'k' => false,
             'P', 'N', 'B', 'R', 'Q', 'K' => true,
@@ -141,9 +145,8 @@ pub const Board = struct {
                 },
                 'p', 'n', 'b', 'r', 'q', 'k', 'P', 'N', 'B', 'R', 'Q', 'K' => {
                     const square = (7 - row) * 8 + col;
-                    result.set(square, piece_from_char(char), color_from_char(char));
-                    std.debug.print("\n{c} at {d}", .{ char, square });
-
+                    result.set(square, piece_from_char(char), is_white_from_char(char));
+                    //std.debug.print("\n{c} at {d}", .{ char, square });
                     col += 1;
                 },
                 ' ' => {},
@@ -157,11 +160,11 @@ pub const Board = struct {
             const char = fen[fen_index];
             switch (char) {
                 'w' => {
-                    std.debug.print("\nWhite to move.", .{});
+                    //std.debug.print("\nWhite to move.", .{});
                     result.whites_turn = true;
                 },
                 'b' => {
-                    std.debug.print("\nBlack to move.", .{});
+                    //std.debug.print("\nBlack to move.", .{});
                     result.whites_turn = false;
                 },
                 ' ' => {},
@@ -175,22 +178,22 @@ pub const Board = struct {
             const char = fen[fen_index];
             switch (char) {
                 '-' => {
-                    std.debug.print("\nNo castling.", .{});
+                    //std.debug.print("\nNo castling.", .{});
                 },
                 'K' => {
-                    std.debug.print("\nWhite can castle kingside.", .{});
+                    //std.debug.print("\nWhite can castle kingside.", .{});
                     result.castling |= 0b0001;
                 },
                 'Q' => {
-                    std.debug.print("\nWhite can castle queenside.", .{});
+                    //std.debug.print("\nWhite can castle queenside.", .{});
                     result.castling |= 0b0010;
                 },
                 'k' => {
-                    std.debug.print("\nBlack can castle kingside.", .{});
+                    //std.debug.print("\nBlack can castle kingside.", .{});
                     result.castling |= 0b0100;
                 },
                 'q' => {
-                    std.debug.print("\nBlack can castle queenside.", .{});
+                    //std.debug.print("\nBlack can castle queenside.", .{});
                     result.castling |= 0b1000;
                 },
                 else => {
@@ -199,7 +202,7 @@ pub const Board = struct {
             }
         }
         //TODO: get ep space and movecounters from fen
-        std.debug.print("\nCastling: 0b{b}", .{result.castling});
+        //std.debug.print("\nCastling: 0b{b}", .{result.castling});
         return result;
     }
 
@@ -219,7 +222,7 @@ pub const Board = struct {
 test "board basics" {
     var board = Board.init_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
     try std.testing.expectEqual(ROOK, board.get_piece(0));
-    try std.testing.expectEqual(true, board.get_color(0));
+    try std.testing.expectEqual(true, board.white_piece_on_sqare(0));
     try std.testing.expectEqual(0b1111, board.castling);
     try std.testing.expectEqual(true, board.whites_turn);
 }
